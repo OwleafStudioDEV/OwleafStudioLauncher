@@ -764,7 +764,7 @@ class Launcher {
         discorderrdialog.openDialog({
           title: "Verificación de Discord",
           content:
-            "Para poder acceder al launcher debes iniciar sesión con tu cuenta de Discord y estar en el servidor de Miguelki Network. <br><br>Quieres iniciar sesión ahora?",
+            "Para poder acceder al launcher debes iniciar sesión con tu cuenta de Discord y estar en el servidor de OWLSAFIO. <br><br>Quieres iniciar sesión ahora?",
           options: true,
           callback: resolve,
         });
@@ -833,7 +833,7 @@ class Launcher {
         discorderrdialog.openDialog({
           title: "Error al verificar la cuenta de Discord",
           content:
-            "No se ha detectado que seas miembro del servidor de Discord. Para poder utilizar el launcher debes ser miembro del servidor. <br><br>Quieres unirte ahora? Se abrirá una ventana en tu navegador.",
+            "No se ha detectado que seas miembro del servidor de Discord. Para poder utilizar el launcher debes ser miembro del servidor. <br>Quieres intentarlo de nuevo?",
           options: true,
           callback: resolve,
         });
@@ -845,7 +845,6 @@ class Launcher {
         await this.verifyDiscordAccount();
         return;
       } else {
-        ipcRenderer.send("open-discord-url");
         configClient.discord_token = null;
         await this.db.updateData("configClient", configClient);
         await this.verifyDiscordAccount();
