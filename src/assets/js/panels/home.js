@@ -5,7 +5,7 @@
 import { config, database, changePanel, appdata, setStatus, setInstanceBackground, pkg, popup, clickHead, getClickeableHead, toggleModsForInstance, discordAccount, toggleMusic, fadeOutAudio, setBackgroundMusic, getUsername, isPerformanceModeEnabled } from '../utils.js'
 import { getHWID, checkHWID, getFetchError, playMSG, playquitMSG, addInstanceMSG } from '../MKLib.js';
 
-const clientId = '1307003977442787451';
+const clientId = '1351277407050534922';
 const DiscordRPC = require('discord-rpc');
 const RPC = new DiscordRPC.Client({ transport: 'ipc' });
 const fs = require('fs');
@@ -27,7 +27,7 @@ RPC.on('ready', async () => {
         startTimestamp: startingTime,
         largeImageKey: 'icon',
         smallImageKey: 'verificado',
-        largeImageText: `Miguelki Network`,
+        largeImageText: `Owleaf Studio`,
         instance: true,
         buttons: [
             {
@@ -232,7 +232,7 @@ class Home {
         let titlechangelog = document.querySelector('.titlechangelog')
         let changelogcontent = document.querySelector('.bbWrapper')
         changelogcontent.innerHTML = `<p>${changelog}</p>`
-        titlechangelog.innerHTML = `Miguelki Network MC Launcher ${version}${subversion ? `-${subversion}` : ''}`;
+        titlechangelog.innerHTML = `Owleaf Studio Launcher ${version}${subversion ? `-${subversion}` : ''}`;
 
         let newsElement = document.querySelector('.news-list');
         let news = await config.getNews().then(res => res).catch(err => false);
@@ -563,7 +563,7 @@ class Home {
                 let popupError = new popup()
                 popupError.openPopup({
                     title: 'Error',
-                    content: 'No puedes iniciar ninguna instancia debido al bloqueo de dispositivo presente.<br><br>Si crees que esto es un error, abre ticket en el discord de Miguelki Network.',
+                    content: 'No puedes iniciar ninguna instancia debido al bloqueo de dispositivo presente.<br><br>Si crees que esto es un error, abre ticket en el discord de Owleaf Studio.',
                     color: 'red',
                     options: true
                 })
@@ -732,7 +732,7 @@ class Home {
                     startTimestamp: startingTime,
                     largeImageKey: 'icon',
                     smallImageKey: 'verificado',
-                    largeImageText: `Miguelki Network`,
+                    largeImageText: `Owleaf Studio`,
                     instance: true,
                     buttons: [
                         {
@@ -790,7 +790,7 @@ class Home {
                     startTimestamp: startingTime,
                     largeImageKey: 'icon',
                     smallImageKey: 'verificado',
-                    largeImageText: `Miguelki Network`,
+                    largeImageText: `Owleaf Studio`,
                     instance: true,
                     buttons: [
                         {
@@ -817,7 +817,7 @@ class Home {
                         startTimestamp: startingTime,
                         largeImageKey: 'icon',
                         smallImageKey: 'verificado',
-                        largeImageText: `Miguelki Network`,
+                        largeImageText: `Owleaf Studio`,
                         instance: true,
                         buttons: [
                             {
@@ -855,7 +855,7 @@ class Home {
                         state: `En el launcher`,
                         largeImageKey: 'icon',
                         smallImageKey: 'verificado',
-                        largeImageText: `Miguelki Network`,
+                        largeImageText: `Owleaf Studio`,
                         instance: true,
                         buttons: [
                             {
