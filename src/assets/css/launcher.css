@@ -564,7 +564,7 @@ input::-webkit-inner-spin-button {
 .scroll-to-bottom {
   display: none;
   position: absolute;
-  bottom: 70px;
+  bottom: 150px; /* Changed to position from top to bottom */
   right: 10px;
   width: 50px;
   height: 50px;
@@ -602,9 +602,43 @@ input::-webkit-inner-spin-button {
   margin: auto;
 }
 
+.patch-toolkit {
+  position: absolute;
+  bottom: 80px;
+  right: 10px;
+  width: 50px;
+  height: 50px;
+  background: rgba(0, 0, 0, 0.9);
+  color: #fff;
+  border: 1px solid rgba(255, 255, 255, 0.18);
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  z-index: 10;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+  opacity: 1;
+  transition: all 0.5s;
+}
+
+.patch-toolkit:hover {
+  background-color: var(--box-button-hover);
+  transition: all 0.5s;
+}
+
+.patch-toolkit::before {
+  content: '\f0ad';
+  font-family: 'Font Awesome 5 Free';
+  font-weight: 900;
+  font-size: 24px;
+  display: block;
+  margin: auto;
+}
+
 .report-issue {
   position: absolute;
-  bottom: 10px;
+  bottom: 10px; /* Keep at bottom */
   right: 10px;
   width: 50px;
   height: 50px;
@@ -845,11 +879,17 @@ input::-webkit-inner-spin-button {
   color: white;
   font-size: 16px;
   font-weight: bold;
+  transition: border-color 0.3s, background-color 0.3s;
 }
 
 .setup-download-input:focus {
   outline: none;
   border-color: var(--color);
+}
+
+.setup-download-input.invalid {
+  border-color: red;
+  background-color: rgba(255, 0, 0, 0.1);
 }
 
 .setup-note {
@@ -921,11 +961,17 @@ input::-webkit-inner-spin-button {
   color: white;
   font-size: 16px;
   font-weight: bold;
+  transition: border-color 0.3s, background-color 0.3s;
 }
 
 .setup-download-input:focus {
   outline: none;
   border-color: var(--color);
+}
+
+.setup-download-input.invalid {
+  border-color: red;
+  background-color: rgba(255, 0, 0, 0.1);
 }
 
 .setup-note {
@@ -1292,7 +1338,7 @@ body.performance-mode .settings-content {
   background-color: rgba(0, 120, 215, 1);
   top: 50%;
   left: 50%;
-  transform: translate(-50%, -50%);
+  transform: translate(-50%);
 }
 
 .setup-launcher-behavior-label {
@@ -1359,7 +1405,7 @@ body.performance-mode .settings-content {
   background-color: rgba(0, 120, 215, 1);
   top: 50%;
   left: 50%;
-  transform: translate(-50%, -50%);
+  transform: translate(-50%);
 }
 
 .setup-launcher-behavior-label {
@@ -1472,5 +1518,23 @@ body.performance-mode .loading-overlay {
 
 body.performance-mode .loading-overlay {
   transition: none !important;
+}
+
+.max-downloads-error {
+  color: red !important;
+  font-size: 12px !important;
+  margin-top: 5px !important;
+  text-align: center;
+  font-weight: normal;
+  width: 100%;
+}
+
+.setup-download-input-container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  margin-top: 10px;
+  position: relative;
 }
 

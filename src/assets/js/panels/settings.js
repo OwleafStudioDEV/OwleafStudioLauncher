@@ -752,7 +752,7 @@ class Settings {
     }
 
     async terms() {
-/*         try { */
+        try {
             const result = await getTermsAndConditions();
         
             const termsContainer = document.querySelector('.info-container');
@@ -771,13 +771,11 @@ class Settings {
                     shell.openExternal(url);
                 });
             });
-/*         } catch (error) {
+        } catch (error) {
             console.error('Error al inicializar los términos y condiciones:', error);
             const termsContainer = document.querySelector('.info-container');
             termsContainer.innerHTML = '<p>Ha ocurrido un error al cargar los términos y condiciones.</p>';
-        } */
+        }
     }
-    
-
 }
 export default Settings;
