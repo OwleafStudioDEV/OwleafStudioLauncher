@@ -1,7 +1,7 @@
 {
     "name": "OwleafStudio-Launcher",
     "preductname": "Owleaf Studio Launcher",
-    "version": "1.0.0",
+    "version": "1.0.1",
     "sub_version": "",
     "changelog": "Esta es la primera versión del launcher de Owleaf Studio.",
     "description": "Launcher de minecraft para los servidores de Owleaf Studio.",
