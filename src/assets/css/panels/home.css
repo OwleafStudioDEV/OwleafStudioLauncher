@@ -59,7 +59,7 @@
     height: 3.3rem;
     width: 3.3rem;
     opacity: 1;
-    border-radius: 15px;
+    border-radius: 50px;
     border: 1px solid rgba(255, 255, 255, 0.18);
     transition: all 0.2s;
 }
@@ -942,7 +942,7 @@
     height: 3rem;
     background-size: cover;
     background-position: center;
-    border-radius: 15px;
+    border-radius: 50px;
     cursor: pointer;
     transition: transform 0.2s, border 0.2s;
 }
