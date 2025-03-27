@@ -2,7 +2,7 @@
  * @author Luuxis
  * @license CC-BY-NC 4.0 - https://creativecommons.org/licenses/by-nc/4.0
  */
-import { config, database, changePanel, appdata, setStatus, setInstanceBackground, pkg, popup, clickHead, getClickeableHead, toggleModsForInstance, discordAccount, toggleMusic, fadeOutAudio, setBackgroundMusic, getUsername, isPerformanceModeEnabled } from '../utils.js'
+import { config, database, changePanel, appdata, setStatus, setInstanceBackground, pkg, popup, clickHead, getClickeableHead, toggleModsForInstance, discordAccount, toggleMusic, fadeOutAudio, setBackgroundMusic, getUsername, isPerformanceModeEnabled, removeUserFromQueue } from '../utils.js'
 import { getHWID, checkHWID, getFetchError, playMSG, playquitMSG, addInstanceMSG } from '../MKLib.js';
 import cleanupManager from '../utils/cleanup-manager.js';
 
@@ -331,7 +331,6 @@ class Home {
         let instanceSelectBTN = document.querySelector('.instance-select');
         let instanceCloseBTN = document.querySelector('.close-popup');
 
-        // Show no instances message if needed
         if (!instancesList || instancesList.length === 0) {
             instancesGrid.innerHTML = `
                 <div class="no-instances-message">
@@ -339,31 +338,26 @@ class Home {
                     <p>Contacta con un administrador o usa el botón + para agregar una instancia con código.</p>
                 </div>
             `;
-            // If there are no instances, don't try to set an instance
             if (configClient.instance_selct) {
                 configClient.instance_selct = null;
                 await this.db.updateData('configClient', configClient);
             }
-            return; // Exit the method as there's nothing more to do
         }
 
         if (!instanceSelect) {
             let newInstanceSelect = instancesList.find(i => i.whitelistActive == false);
             
-            // Only proceed if we found a non-whitelist instance
             if (newInstanceSelect) {
                 configClient.instance_selct = newInstanceSelect.name;
                 instanceSelect = newInstanceSelect.name;
                 await this.db.updateData('configClient', configClient);
             } else if (instancesList.length > 0) {
-                // If all instances have whitelist, just use the first one
                 configClient.instance_selct = instancesList[0].name;
                 instanceSelect = instancesList[0].name;
                 await this.db.updateData('configClient', configClient);
             }
         }
 
-        // Only continue if we have instances to work with
         if (instancesList && instancesList.length > 0) {
             for (let instance of instancesList) {
                 if (instance.whitelistActive) {
@@ -372,7 +366,6 @@ class Home {
                         if (instance.name == instanceSelect) {
                             let newInstanceSelect = instancesList.find(i => i.whitelistActive == false);
                             
-                            // Add this check to handle the case when no non-whitelist instance is found
                             if (newInstanceSelect) {
                                 configClient.instance_selct = newInstanceSelect.name;
                                 instanceSelect = newInstanceSelect.name;
@@ -381,7 +374,6 @@ class Home {
                                 setInstanceBackground(newInstanceSelect.background);
                                 await this.db.updateData('configClient', configClient);
                             } else if (instancesList.length > 0) {
-                                // If all instances have whitelist, just use the first one
                                 configClient.instance_selct = instancesList[0].name;
                                 instanceSelect = instancesList[0].name;
                                 setStatus(instancesList[0]);
@@ -395,7 +387,6 @@ class Home {
                     console.log(`Configurando instancia ${instance.name}...`);
                 }
                 
-                // Only try to set these if instanceSelect exists and matches the current instance
                 if (instanceSelect && instance.name == instanceSelect) {
                     setStatus(instance);
                     setBackgroundMusic(instance.backgroundMusic);
@@ -411,13 +402,11 @@ class Home {
                 if (instanceSelectBTN.disabled) return;
                 let username = await getUsername();
                 
-                // Get fresh instance list when clicking the button
                 let refreshedInstancesList = await config.getInstanceList();
                 
                 instancesGrid.innerHTML = '';
                 
                 if (!refreshedInstancesList || refreshedInstancesList.length === 0) {
-                    // Show no instances message
                     instancesGrid.innerHTML = `
                         <div class="no-instances-message">
                             <p>No hay instancias disponibles</p>
@@ -425,7 +414,6 @@ class Home {
                         </div>
                     `;
                 } else {
-                    // Add available instances to grid
                     let visibleInstanceCount = 0;
                     
                     for (let instance of refreshedInstancesList) {
@@ -442,7 +430,6 @@ class Home {
                         }
                     }
                     
-                    // If no instances are visible to this user (all are whitelist-protected)
                     if (visibleInstanceCount === 0) {
                         instancesGrid.innerHTML = `
                             <div class="no-instances-message">
@@ -451,7 +438,6 @@ class Home {
                             </div>
                         `;
                     } else {
-                        // Add classes based on the number of instances in the last row
                         const remainder = visibleInstanceCount % 3;
                         instancesGrid.classList.remove('one-item', 'two-items');
                         
@@ -487,19 +473,15 @@ class Home {
                     let options = instance.find(i => i.name == configClient.instance_selct);
                     setStatus(options);
                     setBackgroundMusic(options.backgroundMusic);
-                    // Check if performance mode is enabled
                     const performanceMode = isPerformanceModeEnabled();
                     if (performanceMode) {
-                        // Update the data attribute for reference
                         document.querySelector('.server-status-icon')?.setAttribute('data-background', options.background);
-                        // Directly capture and set the frame for the new instance
                         if (options.background && options.background.match(/^(http|https):\/\/[^ "]+$/)) {
                             await captureAndSetVideoFrame(options.background);
                         } else {
                             await captureAndSetVideoFrame();
                         }
                     } else {
-                        // Normal behavior with transitions
                         setInstanceBackground(options.background);
                     }
                     this.updateSelectedInstanceStyle(newInstanceSelect);
@@ -507,6 +489,7 @@ class Home {
             });
 
             instanceBTN.addEventListener('click', async () => {
+                this.disablePlayButton();
                 this.startGame();
             });
 
@@ -516,12 +499,26 @@ class Home {
             });
         }
     }
+    
+    disablePlayButton() {
+        const playInstanceBTN = document.querySelector('.play-instance');
+        playInstanceBTN.disabled = true;
+        playInstanceBTN.style.pointerEvents = "none";
+        playInstanceBTN.style.opacity = "0.5";
+    }
+    
+    enablePlayButton() {
+        const playInstanceBTN = document.querySelector('.play-instance');
+        playInstanceBTN.disabled = false;
+        playInstanceBTN.style.pointerEvents = "auto";
+        playInstanceBTN.style.opacity = "1";
+    }
 
     async startGame() {
         let configClient = await this.db.readData('configClient');
         
-        // Check if an instance is selected
         if (!configClient.instance_selct) {
+            this.enablePlayButton();
             let popupError = new popup();
             popupError.openPopup({
                 title: 'Selecciona una instancia',
@@ -532,13 +529,13 @@ class Home {
             return;
         }
         
-        let launch = new Launch();
+        
         let instance = await config.getInstanceList();
         let authenticator = await this.db.readData('accounts', configClient.account_selected);
         let options = instance.find(i => i.name == configClient.instance_selct);
         
-        // If the selected instance no longer exists
         if (!options) {
+            this.enablePlayButton();
             let popupError = new popup();
             popupError.openPopup({
                 title: 'Instancia no encontrada',
@@ -565,6 +562,7 @@ class Home {
 
         if (check) {
             if (fetchError == false) {
+                this.enablePlayButton();
                 let popupError = new popup()
                 popupError.openPopup({
                     title: 'Error',
@@ -574,6 +572,7 @@ class Home {
                 })
                 return;
             } else {
+                this.enablePlayButton();
                 let popupError = new popup()
                 popupError.openPopup({
                     title: 'Error',
@@ -585,6 +584,7 @@ class Home {
             }
         }
         if (options.maintenance) {
+            this.enablePlayButton();
             let popupError = new popup()
             if (options.maintenancemsg == '') {
                 popupError.openPopup({
@@ -606,6 +606,7 @@ class Home {
 
         let username = await getUsername();
         if (options.whitelistActive && !options.whitelist.includes(username)) {
+            this.enablePlayButton();
             let popupError = new popup();
             popupError.openPopup({
                 title: 'Error',
@@ -628,10 +629,48 @@ class Home {
                 });
             });
             if (dialogResult === 'cancel') {
+                this.enablePlayButton();
                 return;
             }
         }
 
+        playInstanceBTN.style.display = "none";
+        infoStartingBOX.style.display = "block";
+        instanceSelectBTN.disabled = true;
+        instanceSelectBTN.classList.add('disabled');
+        progressBar.style.display = "none";
+        
+        try {
+            const queueResult = await this.checkQueueStatus(hwid, username);
+            if (queueResult.cancelled) {
+                this.enablePlayButton();
+                playInstanceBTN.style.display = "flex";
+                infoStartingBOX.style.display = "none";
+                instanceSelectBTN.disabled = false;
+                instanceSelectBTN.classList.remove('disabled');
+                return;
+            }
+        } catch (error) {
+            console.error("Error in queue system:", error);
+            this.enablePlayButton();
+            playInstanceBTN.style.display = "flex";
+            infoStartingBOX.style.display = "none";
+            instanceSelectBTN.disabled = false;
+            instanceSelectBTN.classList.remove('disabled');
+            
+            let popupError = new popup();
+            popupError.openPopup({
+                title: 'Error en la cola',
+                content: 'Ha ocurrido un error al conectar con el sistema de cola. Por favor, inténtalo de nuevo más tarde.',
+                color: 'red',
+                options: true
+            });
+            return;
+        }
+        
+        progressBar.style.display = "";
+        ipcRenderer.send('main-window-progress-load');
+        
         let recentInstances = configClient.recent_instances || [];
         recentInstances = recentInstances.filter(name => name !== options.name);
         recentInstances.unshift(options.name);
@@ -641,6 +680,8 @@ class Home {
         await this.loadRecentInstances();
         await this.loadRecentInstances();
 
+
+        let launch = new Launch();
         let opt = {
             url: options.url,
             authenticator: authenticator,
@@ -731,28 +772,14 @@ class Home {
             if (configClient.launcher_config.closeLauncher == 'close-launcher') {
                 ipcRenderer.send("main-window-hide")
             };
-            if (rpcActive) {
-                RPC.setActivity({
-                    state: `Jugando a ${configClient.instance_selct}`,
-                    startTimestamp: startingTime,
-                    largeImageKey: 'icon',
-                    smallImageKey: 'verificado',
-                    largeImageText: `Owleaf Studio`,
-                    instance: true,
-                    buttons: [
-                        {
-                            label: `Discord`,
-                            url: pkg.discord_url,
-                        }
-                    ]
-                })
-            }
-            if(!playing) {
+
+            if (!playing) {
                 playing = true;
                 playMSG(configClient.instance_selct);
+                
+                removeUserFromQueue(hwid);
             }
-            console.log(e);
-
+            
             ipcRenderer.send('main-window-progress-load')
             infoStarting.innerHTML = `Iniciando...`
         })
@@ -774,11 +801,7 @@ class Home {
             infoStarting.innerHTML = `Cerrando...`
             console.log('Close');
             
-            // Now that the game has closed, use the dedicated method to trigger cleanup
-            if (options.cleaning && options.cleaning.enabled) {
-                console.log(`Game closed - triggering cleanup for instance '${options.name}'`);
-                cleanupManager.cleanupOnGameClose(options.name);
-            }
+            this.enablePlayButton();
             
             if (rpcActive) {
                 RPC.setActivity({
@@ -801,6 +824,8 @@ class Home {
         });
 
         launch.on('error', err => {
+            removeUserFromQueue(hwid);
+            
             let popupError = new popup()
             if (typeof err.error === 'undefined') {
                 console.warn('Ha occurrido un error en la descarga de algún archivo. Si el juego no inicia correctamente esto puede ser la causa.');
@@ -846,6 +871,9 @@ class Home {
                 infoStarting.innerHTML = `Verificando...`
                 console.log(err);
                 this.notification()
+                
+                this.enablePlayButton();
+                
                 if (rpcActive) {
                     RPC.setActivity({
                         state: `En el launcher`,
@@ -887,6 +915,78 @@ class Home {
                 }
             });
         }
+    }
+
+    async checkQueueStatus(hwid, username) {
+        return new Promise(async (resolve, reject) => {
+            let cancelled = false;
+            let infoStarting = document.querySelector(".info-starting-game-text");
+            
+            let cancelButton = document.createElement('button');
+            cancelButton.textContent = 'Cancelar';
+            cancelButton.classList.add('cancel-queue-button');
+            
+            cancelButton.addEventListener('click', async () => {
+                cancelled = true;
+                document.querySelector('.info-starting-game').removeChild(cancelButton);
+                await removeUserFromQueue(hwid);
+                resolve({ cancelled: true });
+            });
+            
+            document.querySelector('.info-starting-game').appendChild(cancelButton);
+            
+            const checkStatus = async () => {
+                if (cancelled) return;
+                
+                try {
+                    const formData = new URLSearchParams();
+                    formData.append('hwid', hwid);
+                    formData.append('username', username);
+                    
+                    const response = await fetch(`${pkg.url}/api/queue-status.php`, {
+                        method: 'POST',
+                        body: formData,
+                        headers: {
+                            'Content-Type': 'application/x-www-form-urlencoded'
+                        }
+                    });
+                    
+                    if (!response.ok) {
+                        throw new Error(`Error en la respuesta: ${response.status}`);
+                    }
+                    
+                    const data = await response.json();
+                    console.log(data.message);
+                    
+                    if (data.status === 'open') {
+                        if (document.querySelector('.info-starting-game').contains(cancelButton)) {
+                            document.querySelector('.info-starting-game').removeChild(cancelButton);
+                        }
+                        infoStarting.innerHTML = `Preparando lanzamiento...`;
+                        resolve({ cancelled: false });
+                        return;
+                    } else if (data.status === 'on_queue') {
+                        infoStarting.innerHTML = `En cola, posición: ${data.position}`;
+                        
+                        if (!cancelled) {
+                            setTimeout(checkStatus, 30000);
+                        }
+                    } else {
+                        throw new Error(`Estado de cola desconocido: ${data.status}`);
+                    }
+                } catch (error) {
+                    console.error('Error checking queue status:', error);
+                    
+                    if (document.querySelector('.info-starting-game').contains(cancelButton)) {
+                        document.querySelector('.info-starting-game').removeChild(cancelButton);
+                    }
+                    
+                    reject(error);
+                }
+            };
+            
+            await checkStatus();
+        });
     }
 
     async loadRecentInstances() {
@@ -997,11 +1097,9 @@ class Home {
         });
     }
 
-    // Add this helper function to update the background immediately if needed
     updateInstanceBackground(instance) {
         const performanceMode = isPerformanceModeEnabled();
         if (performanceMode) {
-            // For performance mode, immediately set instance background
             if (instance.background && instance.background.match(/^(http|https):\/\/[^ "]+$/)) {
                 captureAndSetVideoFrame(instance.background);
             }
@@ -1106,7 +1204,6 @@ class Home {
         playerHead.addEventListener('mouseleave', () => hideTooltip(playerHead));
     }
     
-    // Find and run cleanup batch files
     async runCleanupBatchFiles() {
         try {
             const fs = require('fs');
@@ -1114,7 +1211,6 @@ class Home {
             const glob = require('glob');
             const { exec } = require('child_process');
             
-            // Get the path to the instances folder
             const appDir = await appdata();
             const instancesDir = path.join(appDir, process.platform === 'darwin' ? this.config.dataDirectory : `.${this.config.dataDirectory}`, 'instances');
             
@@ -1123,13 +1219,11 @@ class Home {
                 return;
             }
             
-            // Find all batch files starting with _cleanup_
             const batchFiles = glob.sync(path.join(instancesDir, '**', '_cleanup_*.bat'));
             
             if (batchFiles.length > 0) {
                 console.log(`Found ${batchFiles.length} cleanup batch files to run`);
                 
-                // Execute each batch file
                 for (const batchFile of batchFiles) {
                     console.log(`Executing cleanup batch file: ${batchFile}`);
                     exec(`"${batchFile}"`, (error, stdout, stderr) => {
