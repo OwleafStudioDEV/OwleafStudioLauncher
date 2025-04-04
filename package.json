@@ -1,9 +1,9 @@
 {
     "name": "OwleafStudio-Launcher",
     "preductname": "Owleaf Studio Launcher",
-    "version": "1.0.4",
+    "version": "1.0.5",
     "sub_version": "",
-    "changelog": "Mejorados algunos aspectos de rendimiento.",
+    "changelog": "Actualizados errores de parcheo.",
     "description": "Launcher de minecraft para los servidores de Owleaf Studio.",
     "main": "src/app.js",
     "author": {
@@ -36,7 +36,7 @@
         "express": "^4.19.2",
         "html2canvas": "^1.4.1",
         "marked": "^14.1.2",
-        "minecraft-java-core": "^4.0.0-alpha.1",
+        "minecraft-java-core": "^4.0.0",
         "node-bdd": "^2.0.4",
         "node-fetch": "^2.7.0",
         "node-machine-id": "^1.0.0",
