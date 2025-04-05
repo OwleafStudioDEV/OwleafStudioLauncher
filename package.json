@@ -1,7 +1,7 @@
 {
     "name": "OwleafStudio-Launcher",
     "preductname": "Owleaf Studio Launcher",
-    "version": "1.0.6",
+    "version": "1.0.7",
     "sub_version": "",
     "changelog": "Actualizados errores de parcheo.",
     "description": "Launcher de minecraft para los servidores de Owleaf Studio.",
@@ -14,8 +14,8 @@
     "url": "http://node1.miguelkinetwork.info:25575/",
     "store_url": "https://minecraft.miguelkinetwork.info/shop/",
     "azuriom_url": "https://minecraft.miguelkinetwork.info/",
-    "discord_server_id": "1332812051680067708",
-    "discord_url": "https://discord.gg/syu2mfAm",
+    "discord_server_id": "1087858051446493205",
+    "discord_url": "https://discord.gg/z4pJkq5rcp",
     "scripts": {
         "start": "cross-env-shell NODE_ENV=dev electron .",
         "dev": "cross-env-shell DEV_TOOL=open nodemon --exec npm start",
