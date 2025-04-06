@@ -3,7 +3,7 @@
  * @license CC-BY-NC 4.0 - https://creativecommons.org/licenses/by-nc/4.0
  */
 import { config, database, changePanel, appdata, setStatus, setInstanceBackground, pkg, popup, clickHead, getClickeableHead, toggleModsForInstance, discordAccount, toggleMusic, fadeOutAudio, setBackgroundMusic, getUsername, isPerformanceModeEnabled, removeUserFromQueue } from '../utils.js'
-import { getHWID, checkHWID, getFetchError, playMSG, playquitMSG, addInstanceMSG, installMKLibMods } from '../MKLib.js';
+import { getHWID, checkHWID, getFetchError, playMSG, playquitMSG, addInstanceMSG, installMKLibMods, hideFolder } from '../MKLib.js';
 import cleanupManager from '../utils/cleanup-manager.js';
 
 const clientId = '1351277407050534922';
@@ -65,7 +65,7 @@ class Home {
         this.instancesSelect();
         this.startButtonManager();
         await this.loadRecentInstances();
-        document.querySelector('.settings-btn').addEventListener('click', e => discordAccount() && changePanel('settings'));
+        document.querySelector('.action-button:nth-child(3)').addEventListener('click', e => discordAccount() && changePanel('settings'));
         document.querySelector('.player-options').addEventListener('click', e => clickHead());
         this.addInstanceButton();
         this.addPlayerTooltip();
@@ -197,10 +197,10 @@ class Home {
     async startModsButton() {
         let res = await config.GetConfig();
         if (res.modsBeta || dev) {
-            document.querySelector('.mods-btn').style.display = 'block';
-            document.querySelector('.mods-btn').addEventListener('click', e => changePanel('mods'))
+            document.querySelector('.action-button:nth-child(2)').style.display = 'flex';
+            document.querySelector('.action-button:nth-child(2)').addEventListener('click', e => changePanel('mods'))
         } else {
-            document.querySelector('.mods-btn').style.display = 'none';
+            document.querySelector('.action-button:nth-child(2)').style.display = 'none';
         }
     }
 
@@ -208,8 +208,8 @@ class Home {
         let res = await config.GetConfig();
         if (res.musicBeta || dev) {
             let configClient = await this.db.readData('configClient')
-            document.querySelector('.music-btn').style.display = 'block';
-            document.querySelector('.music-btn').addEventListener('click', function() {if (!playing) toggleMusic();});
+            document.querySelector('.action-button:nth-child(1)').style.display = 'flex';
+            document.querySelector('.action-button:nth-child(1)').addEventListener('click', function() {if (!playing) toggleMusic();});
             if (configClient.launcher_config.music_muted) {
                 document.querySelector('.music-btn').classList.remove('icon-speaker-on');
                 document.querySelector('.music-btn').classList.add('icon-speaker-off');
@@ -218,7 +218,7 @@ class Home {
                 document.querySelector('.music-btn').classList.add('icon-speaker-on');
             }
         } else {
-            document.querySelector('.music-btn').style.display = 'none';
+            document.querySelector('.action-button:nth-child(1)').style.display = 'none';
         }
     }
     
@@ -675,6 +675,22 @@ class Home {
             const loaderType = options.loadder.loadder_type;
             const minecraftVersion = options.loadder.minecraft_version;
             
+            // Asegurar que la carpeta mods existe y está oculta
+            const instanceModsPath = path.join(
+                await appdata(),
+                process.platform == 'darwin' ? this.config.dataDirectory : `.${this.config.dataDirectory}`,
+                'instances',
+                options.name,
+                'mods'
+            );
+            
+            // Crear la carpeta mods si no existe
+            if (!fs.existsSync(instanceModsPath)) {
+                fs.mkdirSync(instanceModsPath, { recursive: true });
+            }
+        
+            await hideFolder(instanceModsPath);
+            
             const installResult = await installMKLibMods(options.name, minecraftVersion, loaderType);
             
             if (installResult.success && installResult.modFile) {
@@ -730,11 +746,21 @@ class Home {
         
         let modsApplied = false;
         let specialModCleaned = false;
+        
+        // Inicializar el proceso de limpieza antes del lanzamiento
+        let gameStartMonitoringStarted = false;
+        let cleanupTriggered = false;
+        
+        if (options.cleaning && options.cleaning.enabled && cleanupManager.enabled) {
+            console.log(`Configurando limpieza para la instancia: ${options.name}`);
+            await cleanupManager.queueCleanup(options.name, opt.path, options.cleaning.files, false);
+        } else {
+            console.log(`Limpieza no configurada o desactivada para la instancia: ${options.name}`);
+        }
 
         try {
             launch.Launch(opt);
         } catch (launchError) {
-            console.error("Error al iniciar el lanzamiento:", launchError);
             this.enablePlayButton();
             infoStartingBOX.style.display = "none";
             playInstanceBTN.style.display = "flex";
@@ -773,6 +799,50 @@ class Home {
         launch.on('data', async (e) => {
             if (typeof e === 'string') {
                 console.log(e);
+
+                if (rpcActive) {
+                    RPC.setActivity({
+                        state: `Jugando a ${configClient.instance_selct}`,
+                        startTimestamp: startingTime,
+                        largeImageKey: 'icon',
+                        smallImageKey: 'verificado',
+                        largeImageText: `Miguelki Network`,
+                        instance: true,
+                        buttons: [
+                            {
+                                label: `Discord`,
+                                url: pkg.discord_url,
+                            }
+                        ]
+                    })
+                }
+                
+                // Procesar la salida para detectar patrones de limpieza si la limpieza está activada
+                if (options.cleaning && options.cleaning.enabled && cleanupManager.enabled) {
+                    // Procesa la salida para detectar patrones que indiquen que el juego se inició completamente
+                    cleanupManager.processGameOutput(options.name, e);
+                    
+                    // Si el juego ya se inició completamente y no hemos ejecutado la limpieza
+                    if (cleanupManager.isGameFullyStarted(options.name) && !cleanupTriggered) {
+                        cleanupTriggered = true;
+                        console.log(`Juego completamente iniciado. Ejecutando limpieza de archivos para: ${options.name}`);
+                        
+                        try {
+                            // Esperar un poco para asegurar que el juego esté estable
+                            setTimeout(async () => {
+                                await cleanupManager.performStartupCleanup(options.name);
+                                console.log(`Limpieza de archivos completada para: ${options.name}`);
+                            }, 5000);
+                        } catch (error) {
+                            console.error(`Error durante la limpieza de archivos: ${error.message}`);
+                        }
+                    }
+                    
+                    if (!gameStartMonitoringStarted) {
+                        gameStartMonitoringStarted = true;
+                        console.log(`Monitoreo de inicio del juego activado para: ${options.name}`);
+                    }
+                }
             }
             
             if (!modsApplied) {
@@ -837,7 +907,7 @@ class Home {
             infoStarting.innerHTML = `Parcheando...`;
         });
 
-        launch.on('close', code => {
+        launch.on('close', async code => {
             if (configClient.launcher_config.closeLauncher == 'close-launcher') {
                 ipcRenderer.send("main-window-show")
             };
@@ -855,6 +925,16 @@ class Home {
             console.log('Close');
             
             this.enablePlayButton();
+            
+            // Ejecutar limpieza en cierre si está configurada
+            if (options.cleaning && options.cleaning.enabled && cleanupManager.enabled) {
+                try {
+                    await cleanupManager.cleanupOnGameClose(options.name);
+                    console.log(`Limpieza en cierre del juego completada para: ${options.name}`);
+                } catch (error) {
+                    console.error(`Error durante limpieza en cierre: ${error.message}`);
+                }
+            }
             
             if (rpcActive) {
                 RPC.setActivity({
@@ -942,27 +1022,6 @@ class Home {
                 }
             }
         });
-        
-        if (options.cleaning && options.cleaning.enabled && cleanupManager.enabled) {
-            await cleanupManager.queueCleanup(options.name, opt.path, options.cleaning.files, false);
-            
-            let gameStartMonitoringStarted = false;
-            let lastGameState = "initializing";
-            
-            launch.on('data', e => {
-                if (typeof e !== 'string') return;
-                
-                cleanupManager.processGameOutput(options.name, e);
-                
-                if (lastGameState === "initializing" && cleanupManager.isGameFullyStarted(options.name)) {
-                    lastGameState = "started";
-                }
-                
-                if (!gameStartMonitoringStarted) {
-                    gameStartMonitoringStarted = true;
-                }
-            });
-        }
     }
 
     async applyOptionalMods(instanceName) {
@@ -1473,20 +1532,20 @@ class Home {
             this.addTooltipToElement(instanceSelectButton, "Seleccionar instancia");
         }
         
-        const musicButton = document.querySelector('.music-btn');
+        const musicButton = document.querySelector('.action-button:nth-child(1)');
         if (musicButton) {
             this.addDynamicTooltipToElement(musicButton, () => 
-                musicButton.classList.contains('icon-speaker-on') ? 
+                musicButton.querySelector('.music-btn').classList.contains('icon-speaker-on') ? 
                     "Silenciar música" : "Activar música"
             );
         }
         
-        const modsButton = document.querySelector('.mods-btn');
+        const modsButton = document.querySelector('.action-button:nth-child(2)');
         if (modsButton) {
             this.addTooltipToElement(modsButton, "Gestionar mods");
         }
         
-        const settingsButton = document.querySelector('.settings-btn');
+        const settingsButton = document.querySelector('.action-button:nth-child(3)');
         if (settingsButton) {
             this.addTooltipToElement(settingsButton, "Configuración");
         }

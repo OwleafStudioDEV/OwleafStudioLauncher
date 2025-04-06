@@ -5,8 +5,8 @@
     --box-button: #0078bd;
     --box-button-hover: #053e8a;
     --box-button-hover-2: #001f47;
-    --box-button-gradient-1: 	#00FFFF;
-    --box-button-gradient-2: 	#0096FF;
+    --box-button-gradient-1: #00FFFF;
+    --box-button-gradient-2: #0096FF;
     --notification-red: rgba(255, 0, 0, 0.25);
     --notification-green: rgba(0, 255, 0, 0.25);
     --notification-blue: rgba(0, 0, 255, 0.25);
@@ -165,24 +165,24 @@
 }
 
 .news-list::-webkit-scrollbar {
-    width: 12px; /* Más gruesa */
+    width: 12px;
 }
 
 .news-list::-webkit-scrollbar-track {
-    background: transparent; /* Fondo transparente */
-    margin: 10px 0; /* Mayor espacio para los extremos redondeados */
+    background: transparent;
+    margin: 10px 0;
 }
 
 .news-list::-webkit-scrollbar-thumb {
-    background-color: white; /* Color blanco sólido */
-    border-radius: 20px; /* Más redondeado */
-    border: 4px solid rgba(0, 0, 0, 0); /* Borde invisible para efecto redondeado */
-    background-clip: padding-box; /* Asegura que el background no se extienda más allá del borde */
-    min-height: 50px; /* Más altura mínima */
+    background-color: white;
+    border-radius: 20px;
+    border: 4px solid rgba(0, 0, 0, 0);
+    background-clip: padding-box;
+    min-height: 50px;
 }
 
 .news-list::-webkit-scrollbar-thumb:hover {
-    background-color: #e0e0e0; /* Ligeramente más oscuro al hover */
+    background-color: #e0e0e0;
 }
 
 .news-list::-webkit-scrollbar-button {
@@ -205,24 +205,24 @@
 }
 
 .changelog-store-list::-webkit-scrollbar {
-    width: 12px; /* Más gruesa */
+    width: 12px;
 }
 
 .changelog-store-list::-webkit-scrollbar-track {
-    background: transparent; /* Fondo transparente */
-    margin: 10px 0; /* Mayor espacio para los extremos redondeados */
+    background: transparent;
+    margin: 10px 0;
 }
 
 .changelog-store-list::-webkit-scrollbar-thumb {
-    background-color: white; /* Color blanco sólido */
-    border-radius: 20px; /* Más redondeado */
-    border: 4px solid rgba(0, 0, 0, 0); /* Borde invisible para efecto redondeado */
-    background-clip: padding-box; /* Asegura que el background no se extienda más allá del borde */
-    min-height: 50px; /* Más altura mínima */
+    background-color: white;
+    border-radius: 20px;
+    border: 4px solid rgba(0, 0, 0, 0);
+    background-clip: padding-box;
+    min-height: 50px;
 }
 
 .changelog-store-list::-webkit-scrollbar-thumb:hover {
-    background-color: #e0e0e0; /* Ligeramente más oscuro al hover */
+    background-color: #e0e0e0;
 }
 
 .changelog-store-list::-webkit-scrollbar-button {
@@ -434,27 +434,52 @@
     justify-content: center;
     align-items: center;
     position: relative;
-    background-color: var(--box-button);
-    box-shadow: 0px 3px 6px #00000029;
+    background: linear-gradient(135deg, var(--box-button) 0%, var(--box-button-hover) 100%);
+    box-shadow: 0px 3px 10px rgba(0, 120, 189, 0.3);
     border-radius: 10px;
-    color: var(--icon-unselected);
+    color: #fff;
     cursor: pointer;
     z-index: 3;
-    transition: color 0.05s, background-color 0.2s, background-image 0.2s, top 0.2s, left 0.2s, height 0.2s, opacity 0.2s, margin 0.2s;
+    transition: all 0.3s ease;
     height: 3.2rem;
-    padding-right: 1rem;
-    padding-left: 1rem;
+    padding-right: 1.5rem;
+    padding-left: 1.5rem;
+    border: 1px solid rgba(255, 255, 255, 0.18);
+    overflow: hidden;
 }
+
+.play-instance:before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(135deg, var(--box-button-gradient-1) 0%, var(--box-button-gradient-2) 100%);
+    opacity: 0;
+    transition: opacity 0.3s ease;
+    z-index: -1;
+}
+
 .play-instance:hover {
-    color: var(--icon-hover);
-    background-color: var(--box-button-hover);
+    transform: translateY(-2px) scale(1.02);
+    box-shadow: 0px 6px 15px rgba(0, 120, 189, 0.5);
+}
+
+.play-instance:hover:before {
+    opacity: 1;
+}
+
+.play-instance:active {
+    transform: translateY(1px) scale(0.98);
+    box-shadow: 0px 2px 5px rgba(0, 120, 189, 0.3);
 }
 
 .play-btn {
     border: none;
     border-radius: 10px;
     background: none;
-    color:#fff;
+    color: #fff;
     font-size: 2rem;
     font-weight: bolder;
     pointer-events: none;
@@ -462,6 +487,10 @@
     justify-content: center;
     align-items: center; 
     height: 100%;
+    text-shadow: 0px 2px 4px rgba(0, 0, 0, 0.2);
+    position: relative;
+    z-index: 1;
+    letter-spacing: 1px;
 }
 
 .instance-select, .add-instance {
@@ -485,6 +514,87 @@
 .instance-select:hover, .add-instance:hover {
     background: var(--box-button-hover-2);
     transform: scale(1.05);
+}
+
+.grid-icon {
+    width: 50%;
+    height: 50%;
+    filter: invert(1);
+    transform: translateX(0.5px);
+}
+
+.plus-icon {
+    width: 50%;
+    height: 50%;
+    filter: invert(1);
+    transform: translateX(0.5px);
+}
+
+.action-button {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 15px;
+    color: #fff;
+    font-size: 1rem;
+    height: 3.1rem;
+    width: 3.1rem;
+    cursor: pointer;
+    background: rgba(0, 0, 0, 0.05);
+    transition: background 0.2s, border 0.2s;
+    border: 1px solid rgba(255, 255, 255, 0.18);
+    backdrop-filter: blur(15.5px);
+    -webkit-backdrop-filter: blur(15.5px);
+    margin-bottom: 0.1rem;
+}
+
+.action-button:hover {
+    background: var(--box-button-hover-2);
+    transform: scale(1.05);
+}
+
+.action-button:hover .settings-btn {
+    animation: rotation 2s linear infinite;
+}
+
+.music-btn {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 70%;
+    height: 70%;
+    pointer-events: none;
+}
+
+.mods-btn, .settings-btn {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 80%;
+    height: 80%;
+    font-size: 2rem;
+    pointer-events: none;
+}
+
+.icon-speaker-on {
+    background-image: url('../../images/music/speaker-on.png');
+    background-size: 100%;
+    background-repeat: no-repeat;
+    background-position: center;
+    transition: all 0.2s;
+}
+
+.icon-speaker-off {
+    background-image: url('../../images/music/speaker-off.png');
+    background-size: 100%;
+    background-repeat: no-repeat;
+    background-position: center;
+    transition: all 0.2s;
+}
+
+.icon-speaker-on:hover,
+.icon-speaker-off:hover {
+    filter: brightness(50%);
 }
 
 .info-starting-game {
@@ -525,61 +635,6 @@
     align-items: center;
     gap: 1rem;
     margin-bottom: 1.5rem;
-}
-
-.settings-btn {
-    text-align: center;
-    width: 3rem;
-    height: 3rem;
-    font-size: 3rem;
-    border-radius: 100px;
-    color: #fff;
-    cursor: pointer;
-    z-index: 4;
-    transition: color 0.2s, background-image 0.2s, top 0.2s, left 0.2s, height 0.2s, opacity 0.2s, margin 0.2s;
-    margin: 0 1.5rem;
-}
-.settings-btn:hover {
-    color: var(--icon-unselected);
-    animation: rotating 2s linear infinite;
-}
-
-@keyframes rotating {
-    from{
-        -webkit-transform: rotate(0deg);
-    }
-    to{
-        -webkit-transform: rotate(360deg);
-    }
-}
-
-.mods-btn {
-    text-align: center;
-    width: 3rem;
-    height: 3rem;
-    font-size: 3rem;
-    border-radius: 100px;
-    color: #fff;
-    cursor: pointer;
-    z-index: 4;
-    transition: color 0.2s, background-image 0.2s, top 0.2s, left 0.2s, height 0.2s, opacity 0.2s, margin 0.2s;
-}
-.mods-btn:hover {
-    color: var(--icon-unselected);
-}
-
-.music-btn {
-    text-align: center;
-    width: 3rem;
-    height: 3rem;
-    font-size: 3rem;
-    color: #fff;
-    cursor: pointer;
-    z-index: 4;
-    transition: color 0.2s, background-image 0.2s, top 0.2s, left 0.2s, height 0.2s, opacity 0.2s, margin 0.2s;
-}
-.music-btn:hover {
-    color: var(--icon-unselected);
 }
 
 .instance-popup {
@@ -888,40 +943,6 @@
         rgb(255, 0, 127));
     background-size: 50% 50%;
     animation: rotation 4s linear infinite;
-}
-
-.icon-speaker-on {
-    background-image: url('../../images/music/speaker-on.png');
-    background-size: 3rem;
-    background-repeat: no-repeat;
-    background-position: left;
-    transition: all 0.2s;
-}
-
-.icon-speaker-off {
-    background-image: url('../../images/music/speaker-off.png');
-    background-size: 3rem;
-    background-repeat: no-repeat;
-    background-position: left;
-    transition: all 0.2s;
-}
-
-.icon-speaker-on:hover,
-.icon-speaker-off:hover {
-    filter: brightness(50%);
-    transition: all 0.2s;
-}
-
-.grid-icon {
-    width: 50%;
-    height: 50%;
-    filter: invert(1);
-}
-
-.plus-icon {
-    width: 50%;
-    height: 50%;
-    filter: invert(1);
 }
 
 @keyframes rotation {
