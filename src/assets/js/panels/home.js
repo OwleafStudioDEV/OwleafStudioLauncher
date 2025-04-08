@@ -813,7 +813,7 @@ class Home {
                         startTimestamp: startingTime,
                         largeImageKey: 'icon',
                         smallImageKey: 'verificado',
-                        largeImageText: `Miguelki Network`,
+                        largeImageText: `Owleaf Studio`,
                         instance: true,
                         buttons: [
                             {
