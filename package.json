@@ -1,7 +1,7 @@
 {
     "name": "OwleafStudio-Launcher",
     "preductname": "Owleaf Studio Launcher",
-    "version": "1.0.9",
+    "version": "1.0.10",
     "sub_version": "",
     "changelog": "Mejoras estéticas y funcionales.",
     "description": "Launcher de minecraft para los servidores de Owleaf Studio.",
@@ -11,7 +11,7 @@
         "email": "admin@miguelkinetwork.fun",
         "url": "https://github.com/miguelkix30"
     },
-    "url": "http://node1.miguelkinetwork.info:25575/",
+    "url": "http://owleaf.miguelkinetwork.info/",
     "store_url": "https://minecraft.miguelkinetwork.info/shop/",
     "azuriom_url": "https://minecraft.miguelkinetwork.info/",
     "discord_url": "https://discord.gg/owleafstudio",
