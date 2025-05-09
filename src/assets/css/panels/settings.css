@@ -738,7 +738,7 @@ input:disabled::placeholder {
 
 .reset-config-btn:hover {
     transform: translateY(-3px);
-    box-shadow: 0 6px 15px rgba(0, 120, 189, 0.5);
+    box-shadow: 0 6px 15px rgba(48, 252, 146, 0.5);
 }
 
 .reset-config-btn:hover::before {
