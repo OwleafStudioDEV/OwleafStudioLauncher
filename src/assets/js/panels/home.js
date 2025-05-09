@@ -2,20 +2,22 @@
  * @author Luuxis
  * @license CC-BY-NC 4.0 - https://creativecommons.org/licenses/by-nc/4.0
  */
-import { config, database, changePanel, appdata, setStatus, setInstanceBackground, pkg, popup, clickHead, getClickeableHead, toggleModsForInstance, discordAccount, toggleMusic, fadeOutAudio, setBackgroundMusic, getUsername, isPerformanceModeEnabled, removeUserFromQueue } from '../utils.js'
+import { config, database, changePanel, appdata, setStatus, setInstanceBackground, pkg, popup, clickHead, getClickeableHead, toggleModsForInstance, discordAccount, toggleMusic, fadeOutAudio, setBackgroundMusic, getUsername, isPerformanceModeEnabled, removeUserFromQueue, captureAndSetVideoFrame } from '../utils.js'
 import { getHWID, checkHWID, getFetchError, playMSG, playquitMSG, addInstanceMSG, installMKLibMods, hideFolder, killMinecraftProcess } from '../MKLib.js';
 import cleanupManager from '../utils/cleanup-manager.js';
 
-const clientId = '1351277407050534922';
+const clientId = pkg.discord_client_id;
 const DiscordRPC = require('discord-rpc');
 const RPC = new DiscordRPC.Client({ transport: 'ipc' });
 const fs = require('fs');
 const path = require('path');
+const startingTime = Date.now();
 let dev = process.env.NODE_ENV === 'dev';
 let rpcActive = true;
-let startingTime = Date.now();
 let LogBan = false;
 let playing = false;
+let username;
+let discordUrl = pkg.discord_url;
 DiscordRPC.register(clientId);
 
 async function setActivity() {
@@ -23,23 +25,17 @@ async function setActivity() {
 };
 RPC.on('ready', async () => {
     setActivity();
+    username = await getUsername();
     RPC.setActivity({
         state: `En el launcher`,
         startTimestamp: startingTime,
         largeImageKey: 'icon',
-        smallImageKey: 'verificado',
-        largeImageText: `Owleaf Studio`,
-        instance: true,
-        buttons: [
-            {
-                label: `Discord`,
-                url: pkg.discord_url,
-            }
-        ]
-    }).catch();
+        largeImageText: pkg.preductname,
+        instance: true
+    }).catch(err => {console.error('Error al establecer la actividad de Discord:', err)});
     setInterval(() => {
         setActivity();
-    }, 86400 * 1000);
+    }, 1000);
 });
 RPC.login({ clientId }).catch(err => {
     console.error('Servidor de Discord no detectado. Tranquilo, esto no es una crisis.')
@@ -395,6 +391,34 @@ class Home {
             instanceSelectBTN.removeEventListener('click', this.instanceSelectClickHandler);
             this.instanceSelectClickHandler = async () => {
                 if (instanceSelectBTN.disabled) return;
+                
+                // Verificar si hay bloqueo de dispositivo u otros errores antes de mostrar la ventana
+                let hwid = await getHWID();
+                let check = await checkHWID(hwid);
+                let fetchError = await getFetchError();
+                
+                if (check) {
+                    if (fetchError == false) {
+                        let popupError = new popup();
+                        popupError.openPopup({
+                            title: 'Error',
+                            content: 'No puedes seleccionar ninguna instancia debido al bloqueo de dispositivo presente.<br><br>Si crees que esto es un error, abre ticket en el discord de Miguelki Network.',
+                            color: 'red',
+                            options: true
+                        });
+                        return;
+                    } else {
+                        let popupError = new popup();
+                        popupError.openPopup({
+                            title: 'Error',
+                            content: 'No se ha podido conectar con el Anticheat de Miguelki Network y por lo tanto no se podrá seleccionar ninguna instancia.',
+                            color: 'red',
+                            options: true
+                        });
+                        return;
+                    }
+                }
+                
                 let username = await getUsername();
                 
                 let refreshedInstancesList = await config.getInstanceList();
@@ -524,11 +548,96 @@ class Home {
             return;
         }
         
-        
         let instance = await config.getInstanceList();
-        let authenticator = await this.db.readData('accounts', configClient.account_selected);
-        let options = instance.find(i => i.name == configClient.instance_selct);
         
+        // Verify valid account selection and retrieve account
+        if (!configClient.account_selected) {
+            this.enablePlayButton();
+            let popupError = new popup();
+            popupError.openPopup({
+                title: 'Error de cuenta',
+                content: 'No hay una cuenta seleccionada. Por favor, selecciona una cuenta para continuar.',
+                color: 'red',
+                options: true
+            });
+            return;
+        }
+        
+        console.log(`Obteniendo cuenta con ID: ${configClient.account_selected}`);
+        
+        // First, attempt to sync account IDs to ensure consistency
+        await this.db.syncAccountIds();
+        
+        // Try multiple methods to ensure we get the account
+        let authenticator = null;
+        
+        try {
+            // Method 1: Get account directly
+            authenticator = await this.db.getSelectedAccount();
+            
+            if (authenticator) {
+                console.log(`Cuenta obtenida mediante getSelectedAccount: ${authenticator.name} (ID: ${authenticator.ID})`);
+            }
+        } catch (err) {
+            console.warn(`Error al obtener cuenta seleccionada: ${err.message}`);
+        }
+        
+        // Method 2: Direct reading by ID if Method 1 failed
+        if (!authenticator) {
+            try {
+                authenticator = await this.db.readData('accounts', configClient.account_selected);
+                
+                if (authenticator) {
+                    console.log(`Cuenta obtenida mediante readData: ${authenticator.name} (ID: ${authenticator.ID})`);
+                }
+            } catch (err) {
+                console.warn(`Error al leer cuenta directamente: ${err.message}`);
+            }
+        }
+        
+        // Method 3: If both methods failed, try getting all accounts and filter
+        if (!authenticator) {
+            console.log(`Intentando obtener cuenta desde la lista completa...`);
+            let allAccounts = await this.db.readAllData('accounts');
+            if (Array.isArray(allAccounts) && allAccounts.length > 0) {
+                // Try with both string and number comparison
+                authenticator = allAccounts.find(acc => 
+                    String(acc.ID) === String(configClient.account_selected) || 
+                    Number(acc.ID) === Number(configClient.account_selected)
+                );
+                
+                if (authenticator) {
+                    console.log(`Cuenta encontrada por método alternativo: ${authenticator.name} (ID: ${authenticator.ID})`);
+                    
+                    // Update the account in the database to sync
+                    await this.db.updateData('accounts', authenticator, authenticator.ID);
+                }
+            }
+        }
+        
+        if (!authenticator) {
+            console.error(`No se pudo encontrar la cuenta con ID: ${configClient.account_selected}`);
+            
+            // Get all accounts for logging
+            let allAccounts = await this.db.readAllData('accounts');
+            if (Array.isArray(allAccounts)) {
+                console.log(`Cuentas disponibles: ${allAccounts.map(a => `${a.name}(${a.ID})`).join(', ')}`);
+            }
+            
+            this.enablePlayButton();
+            let popupError = new popup();
+            popupError.openPopup({
+                title: 'Error de cuenta',
+                content: 'La cuenta seleccionada no se encuentra disponible. Por favor, selecciona otra cuenta o inicia sesión nuevamente.',
+                color: 'red',
+                options: true
+            });
+            return;
+        }
+        
+        console.log(`Cuenta recuperada: ${authenticator.name} (ID: ${authenticator.ID})`);
+        let options = instance.find(i => i.name == configClient.instance_selct);
+                
         if (!options) {
             this.enablePlayButton();
             let popupError = new popup();
@@ -711,6 +820,8 @@ class Home {
 
         console.log("Configurando opciones de lanzamiento...");
         let launch = new Launch();
+        
+        
         let opt = {
             url: options.url,
             authenticator: authenticator,
@@ -808,19 +919,15 @@ class Home {
                 console.log(e);
 
                 if (rpcActive) {
+                    username = await getUsername();
                     RPC.setActivity({
                         state: `Jugando a ${configClient.instance_selct}`,
                         startTimestamp: startingTime,
                         largeImageKey: 'icon',
-                        smallImageKey: 'verificado',
-                        largeImageText: `Owleaf Studio`,
-                        instance: true,
-                        buttons: [
-                            {
-                                label: `Discord`,
-                                url: pkg.discord_url,
-                            }
-                        ]
+                        smallImageKey: `https://minotar.net/helm/${username}/512.png`,
+                        smallImageText: username,
+                        largeImageText: pkg.preductname,
+                        instance: true
                     })
                 }
                 
@@ -950,19 +1057,13 @@ class Home {
             }
             
             if (rpcActive) {
+                username = await getUsername();
                 RPC.setActivity({
                     state: `En el launcher`,
                     startTimestamp: startingTime,
                     largeImageKey: 'icon',
-                    smallImageKey: 'verificado',
-                    largeImageText: `Owleaf Studio`,
-                    instance: true,
-                    buttons: [
-                        {
-                            label: `Discord`,
-                            url: pkg.discord_url,
-                        }
-                    ]
+                    largeImageText: pkg.preductname,
+                    instance: true
                 }).catch();
                 playquitMSG(configClient.instance_selct);
                 playing = false;
@@ -972,65 +1073,73 @@ class Home {
         launch.on('error', err => {
             removeUserFromQueue(hwid);
             
-            let popupError = new popup()
             if (typeof err.error === 'undefined') {
                 if (configClient.launcher_config.closeLauncher == 'close-launcher') {
-                    ipcRenderer.send("main-window-show")
-                };
+                    ipcRenderer.send("main-window-show");
+                }
                 if (rpcActive) {
+                    username = getUsername();
                     RPC.setActivity({
                         state: `En el launcher`,
                         startTimestamp: startingTime,
                         largeImageKey: 'icon',
-                        smallImageKey: 'verificado',
-                        largeImageText: `Owleaf Studio`,
-                        instance: true,
-                        buttons: [
-                            {
-                                label: `Discord`,
-                                url: pkg.discord_url,
-                            }
-                        ]
+                        smallImageKey: `https://minotar.net/helm/${username}/512.png`,
+                        smallImageText: username,
+                        largeImageText: pkg.preductname,
+                        instance: true
                     }).catch();
                 }
+                
+                // Handle undefined error case with patch toolkit option
+                const errorDialog = new popup();
+                errorDialog.openDialog({
+                    title: 'Error al iniciar el juego',
+                    content: 'Se ha producido un error al iniciar el juego. ¿Quieres ejecutar el toolkit de parches para intentar solucionarlo?',
+                    options: true,
+                    callback: (result) => {
+                        if (result === 'accept') {
+                            if (window.launcher && typeof window.launcher.runPatchToolkit === 'function') {
+                                window.launcher.runPatchToolkit();
+                            } else {
+                                patchLoader();
+                            }
+                        }
+                    }
+                });
             } else {
+                let popupError = new popup();
                 popupError.openPopup({
                     title: 'Error',
                     content: err.error,
                     color: 'red',
                     options: true
-                })
+                });
 
                 if (configClient.launcher_config.closeLauncher == 'close-launcher') {
-                    ipcRenderer.send("main-window-show")
-                };
-                ipcRenderer.send('main-window-progress-reset')
+                    ipcRenderer.send("main-window-show");
+                }
+                ipcRenderer.send('main-window-progress-reset');
                 if (!musicMuted && !musicPlaying) {
                     musicPlaying = true;
                     setBackgroundMusic(options.backgroundMusic);
                 }
-                infoStartingBOX.style.display = "none"
-                playInstanceBTN.style.display = "flex"
+                infoStartingBOX.style.display = "none";
+                playInstanceBTN.style.display = "flex";
                 instanceSelectBTN.disabled = false;
                 instanceSelectBTN.classList.remove('disabled');
-                infoStarting.innerHTML = `Verificando...`
-                this.notification()
+                infoStarting.innerHTML = `Verificando...`;
+                this.notification();
                 
                 this.enablePlayButton();
                 
                 if (rpcActive) {
+                    username = getUsername();
                     RPC.setActivity({
                         state: `En el launcher`,
                         largeImageKey: 'icon',
                         smallImageKey: 'verificado',
-                        largeImageText: `Owleaf Studio`,
-                        instance: true,
-                        buttons: [
-                            {
-                                label: `Discord`,
-                                url: pkg.discord_url,
-                            }
-                        ]
+                        largeImageText: pkg.preductname,
+                        instance: true
                     }).catch();
                 }
             }

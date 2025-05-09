@@ -1,9 +1,9 @@
 {
     "name": "OwleafStudio-Launcher",
     "preductname": "Owleaf Studio Launcher",
-    "version": "1.0.10",
+    "version": "1.0.11",
     "sub_version": "",
-    "changelog": "Mejoras estéticas y funcionales.",
+    "changelog": "Se ha rediseñado el panel de settings y se ha reescrito el sistema de configuración.",
     "description": "Launcher de minecraft para los servidores de Owleaf Studio.",
     "main": "src/app.js",
     "author": {
@@ -15,6 +15,7 @@
     "store_url": "https://minecraft.miguelkinetwork.info/shop/",
     "azuriom_url": "https://minecraft.miguelkinetwork.info/",
     "discord_url": "https://discord.gg/owleafstudio",
+    "discord_client_id": "1351277407050534922",
     "scripts": {
         "start": "cross-env-shell NODE_ENV=dev electron .",
         "dev": "cross-env-shell DEV_TOOL=open nodemon --exec npm start",
