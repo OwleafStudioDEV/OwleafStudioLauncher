@@ -1,18 +1,3 @@
-* {
-    --icon-unselected: #707070;
-    --box: #1A1A1A;
-    --box-hover: #202020;
-    --box-button: #30fc92;
-    --box-button-hover: #d3fc6c;
-    --box-button-hover-2: #4ffc7c;
-    --box-button-gradient-1: #d3fc6c;
-    --box-button-gradient-2: #1bfcac;
-    --notification-red: rgba(255, 0, 0, 0.25);
-    --notification-green: rgba(0, 255, 0, 0.25);
-    --notification-blue: rgba(0, 0, 255, 0.25);
-    --notification-yellow: rgba(255, 255, 0, 0.25);
-}
-
 .home .container {
     display: flex;
     height: 100%;
@@ -33,6 +18,7 @@
  * Status server                                                               *
  *                                                                             *
  ******************************************************************************/
+
 
 .status-server {
     display: flex;
@@ -59,7 +45,7 @@
     height: 3.3rem;
     width: 3.3rem;
     opacity: 1;
-    border-radius: 50px;
+    border-radius: 15px;
     border: 1px solid rgba(255, 255, 255, 0.18);
     transition: all 0.2s;
 }
@@ -119,6 +105,7 @@
  *                                                                             *
  ******************************************************************************/
 
+
 .storebutton {
     width:98%;
     display:block;
@@ -132,7 +119,6 @@
     z-index: 2;
     transition: color 0.05s, background-color 0.2s, background-image 0.2s, top 0.2s, left 0.2s, height 0.2s, opacity 0.2s, margin 0.2s;
     text-decoration:none;
-    font-weight:bold;
 }
 .storebutton:hover {
     background-color: var(--box-button-hover);
@@ -152,6 +138,7 @@
     flex-direction: row;
     justify-content: space-between;
     width: 100%;
+    flex-shrink: 0; /* Evita que se comprima */
 }
 
 .news-list {
@@ -196,12 +183,16 @@
 
 .changelog-store-list {
     width: 35%;
-    height: 100%;
+    height: 55vh;
     border-radius: 10px;
     margin: 1rem 0;
     overflow-y: auto;
     scrollbar-width: thin;
     scrollbar-color: rgba(255, 255, 255, 0.7) rgba(0, 0, 0, 0.2);
+}
+
+.home .new-tab.with-ads .changelog-store-list {
+    height: calc(53vh - 280px);
 }
 
 .changelog-store-list::-webkit-scrollbar {
@@ -264,21 +255,21 @@
 }
 
 .header-text .titlechangelog {
-    font-size: 1.8rem;
+    font-size: 1.4rem; /* Reducido de 1.8rem */
     text-align: center;
     color: #fff;
     padding: 0;
 }
 
 .header-text .titleshop {
-    font-size: 1.8rem;
+    font-size: 1.4rem; /* Reducido de 1.8rem */
     text-align: center;
     color: #fff;
     padding: 0;
 }
 
 .header-text .titlenews {
-    font-size: 1.8rem;
+    font-size: 1.4rem; /* Reducido de 1.8rem */
     text-align: center;
     color: #fff;
     padding: 0;
@@ -295,7 +286,7 @@
 .news-content .bbWrapper {
     padding: 0 1.5rem;
     padding-bottom: 1rem;
-    font-size: 1.2rem;
+    font-size: 1rem; /* Reducido de 1.2rem */
     color:#fff;
 }
 
@@ -321,6 +312,7 @@
  * social server                                                               *
  *                                                                             *
  ******************************************************************************/
+
 
 .social-tab {
     position: fixed;
@@ -356,6 +348,16 @@
     -webkit-backdrop-filter: blur(5px);
 }
 
+.social-block:hover {
+    background: var(--box-button-hover-2);
+    transform: scale(1.05);
+}
+
+.social-block:active {
+    transform: translateY(1px) scale(0.98);
+    box-shadow: 0px 2px 5px rgba(from var(--box-button) r g b / 0.3);
+}
+
 .social-block .icon-social {
     pointer-events: none;
     background-repeat: no-repeat;
@@ -364,11 +366,23 @@
     filter: var(--svg-color);
 }
 
+/* Estilos específicos para el botón de la tienda con FontAwesome */
+.social-block#shop {
+    color: var(--color);
+}
+
+.social-block#shop i {
+    pointer-events: none;
+    font-size: 1.3rem;
+    color: inherit;
+}
+
 /*******************************************************************************
  *                                                                             *
  * sidebar                                                                     *
  *                                                                             *
  ******************************************************************************/
+
 
 .sidebar {
     display: flex;
@@ -400,8 +414,13 @@
     margin: 1.5rem 0;
 }
 
+/* Añadir efecto al hacer clic en la cabeza del jugador */
+.player-options:active {
+    transform: translateY(1px) scale(0.98);
+}
+
 .player-head {
-    background: url('../../images/default/setve.png'), no-repeat;
+    background: url('../../images/default/steve.png'), no-repeat;
     background-size: cover;
     image-rendering: pixelated;
     transition: var(--transition);
@@ -413,7 +432,7 @@
 }
 
 .player-menu {
-    color: var(--element-color);
+    color: var(--box-button);
     transform: rotate(270deg);
     pointer-events: none;
 }
@@ -435,7 +454,7 @@
     align-items: center;
     position: relative;
     background: linear-gradient(135deg, var(--box-button) 0%, var(--box-button-hover) 100%);
-    box-shadow: 0px 3px 10px rgba(48, 252, 146, 0.3);
+    box-shadow: 0px 3px 10px rgba(from var(--box-button) r g b / 0.3);
     border-radius: 10px;
     color: #fff;
     cursor: pointer;
@@ -463,7 +482,7 @@
 
 .play-instance:hover {
     transform: translateY(-2px) scale(1.02);
-    box-shadow: 0px 6px 15px rgba(48, 252, 146, 0.5);
+    box-shadow: 0px 6px 15px rgba(from var(--box-button) r g b / 0.5);
 }
 
 .play-instance:hover:before {
@@ -472,7 +491,7 @@
 
 .play-instance:active {
     transform: translateY(1px) scale(0.98);
-    box-shadow: 0px 2px 5px rgba(48, 252, 146, 0.3);
+    box-shadow: 0px 2px 5px rgba(from var(--box-button) r g b / 0.3);
 }
 
 .play-btn {
@@ -518,7 +537,7 @@
 
 .instance-select:active, .add-instance:active {
     transform: translateY(1px) scale(0.98);
-    box-shadow: 0px 2px 5px rgba(48, 252, 146, 0.3);
+    box-shadow: 0px 2px 5px rgba(from var(--box-button) r g b / 0.3);
 }
 
 .grid-icon {
@@ -560,7 +579,7 @@
 
 .action-button:active {
     transform: translateY(1px) scale(0.98);
-    box-shadow: 0px 2px 5px rgba(48, 252, 146, 0.3);
+    box-shadow: 0px 2px 5px rgba(from var(--box-button) r g b / 0.3);
 }
 
 .action-button:hover .settings-btn {
@@ -609,14 +628,27 @@
 
 .info-starting-game {
     display: none;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
     text-align: center;
     background: rgba(0, 0, 0, 0.05);
     border-radius: 10px;
     border: 1px solid rgba(255, 255, 255, 0.18);
     backdrop-filter: blur(30px);
     -webkit-backdrop-filter: blur(15.5px);
-    transition: all 0.2s, border 0.2s;
-    padding: 0.5rem;
+    transition: all 0.2s, border 0.2s, height 0.3s ease;
+    padding: 0.75rem 0.5rem;
+    min-height: 3.2rem;
+    height: auto;
+    min-width: 200px;
+}
+
+.info-starting-game-text {
+    color: #fff;
+    font-size: 1rem;
+    margin: 0;
+    white-space: nowrap;
 }
 
 .progress-bar {
@@ -624,19 +656,93 @@
     height: 10px;
     margin: 0.5rem 0;
     width: 15rem;
+    align-self: center;
+    transition: all 0.2s ease;
 }
 
 .progress-bar::-webkit-progress-bar {
-    background: rgba( 0, 0, 0, 0.25 );
+    background: rgba(0, 0, 0, 0.25);
     border: 1px solid rgba(255, 255, 255, 0.5);
     border-radius: 10px;
-    backdrop-filter: blur( 8px );
-    -webkit-backdrop-filter: blur( 5px );
+    backdrop-filter: blur(8px);
+    -webkit-backdrop-filter: blur(5px);
 }
 
 .progress-bar::-webkit-progress-value {
-    background-color: var(--element-color);
+    background-color: var(--box-button);
     border-radius: 10px;
+    transition: width 0.2s ease;
+}
+
+.progress-bar.indeterminate {
+    position: relative;
+    overflow: hidden;
+    background: rgba(0, 0, 0, 0.25);
+    border: 1px solid rgba(255, 255, 255, 0.5);
+    border-radius: 10px;
+}
+
+.progress-bar.indeterminate::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: -100%;
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(90deg, 
+        transparent, 
+        #ffffff, 
+        transparent
+    );
+    animation: slide 1.5s infinite;
+}
+
+@keyframes slide {
+    0% { left: -100%; }
+    100% { left: 100%; }
+}
+
+/* Sub-progress bar styles */
+.sub-progress-container {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    margin-top: 0.3rem;
+    transition: opacity 0.3s ease;
+    width: 100%;
+}
+
+.sub-progress-text {
+    font-size: 0.8rem;
+    color: rgba(255, 255, 255, 0.8);
+    margin-bottom: 0.2rem;
+    text-align: center;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    max-width: 15rem;
+}
+
+.sub-progress-bar {
+    appearance: none;
+    height: 6px;
+    width: 15rem;
+    align-self: center;
+    transition: all 0.2s ease;
+}
+
+.sub-progress-bar::-webkit-progress-bar {
+    background: rgba(0, 0, 0, 0.15);
+    border: 1px solid rgba(255, 255, 255, 0.3);
+    border-radius: 6px;
+    backdrop-filter: blur(4px);
+    -webkit-backdrop-filter: blur(4px);
+}
+
+.sub-progress-bar::-webkit-progress-value {
+    background-color: rgba(255, 255, 255, 0.7);
+    border-radius: 6px;
+    transition: width 0.2s ease;
 }
 
 .button-container {
@@ -699,6 +805,7 @@
     padding-right: 8px; 
     scrollbar-width: thin; 
     scrollbar-color: white transparent;
+    position: relative;
 }
 
 .instances-grid-container::-webkit-scrollbar {
@@ -736,6 +843,7 @@
 }
 
 .instances-grid {
+    transition: opacity 0.3s ease-in-out;
     display: grid;
     grid-template-columns: repeat(3, 250px);
     gap: 3rem;
@@ -743,9 +851,38 @@
     width: 100%;
     max-width: 1200px;
     justify-content: center;
+    justify-items: center;
+}
+
+/* Skeleton grid positioned outside of instances-grid */
+.skeleton-grid {
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    display: grid;
+    grid-template-columns: repeat(3, 250px);
+    gap: 3rem;
+    padding: 1rem;
+    justify-content: center;
+    justify-items: center;
+    opacity: 0.4;
+    z-index: 5;
+}
+
+@media (max-width: 850px) {
+    .skeleton-grid {
+        grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+        gap: 1rem;
+    }
 }
 
 @media (min-width: 850px) {
+    .skeleton-grid {
+        grid-template-columns: repeat(3, 250px);
+    }
+    
     .instances-grid > *:nth-child(3n+1):last-child {
         grid-column: 2;
     }
@@ -772,8 +909,8 @@
 }
 
 .instance-element:hover {
-    background: rgba(48, 252, 146, 0.2);
-    border: 1px solid rgba(48, 252, 146, 0.3);
+    background: rgba(from var(--box-button) r g b / 0.2);
+    border: 1px solid rgba(from var(--box-button) r g b / 0.3);
 }
 
 .instance-image {
@@ -802,8 +939,8 @@
 }
 
 .active-instance {
-    background: rgba(48, 252, 146, 0.4);
-    border: 1px solid rgba(48, 252, 146, 0.3);
+    background: rgba(from var(--box-button) r g b / 0.4);
+    border: 1px solid rgba(from var(--box-button) r g b / 0.3);
 }
 
 .close-popup {
@@ -835,7 +972,7 @@
 }
 
 .instance-elements:hover {
-    background: var(--element-color);
+    background: var(--box-button);
 }
 
 .message-container {
@@ -973,17 +1110,29 @@
     height: 3rem;
     background-size: cover;
     background-position: center;
-    border-radius: 50px;
+    border-radius: 15px;
     cursor: pointer;
-    transition: transform 0.2s, border 0.2s;
+    transition: transform 0.2s, border 0.2s, box-shadow 0.3s;
+    position: relative;
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
+    border: 1px solid rgba(255, 255, 255, 0.2);
 }
 
 .recent-instance-button:hover {
     transform: scale(1.05);
+    border-color: rgba(255, 255, 255, 0.5);
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.3);
+}
+
+/* Añadir efecto al hacer clic en los botones de instancias recientes */
+.recent-instance-button:active {
+    transform: translateY(1px) scale(0.98);
+    box-shadow: 0px 2px 3px rgba(from var(--box-button) r g b / 0.3);
 }
 
 .recent-instance-button.selected-instance {
-    border: 4px solid white;
+    border: 3px solid white;
+    box-shadow: 0 0 10px rgba(255, 255, 255, 0.5);
 }
 
 .tooltip {
@@ -1089,7 +1238,7 @@
 
 .add-instance-input:focus {
     border-color: var(--box-button);
-    box-shadow: 0 0 8px rgba(48, 252, 146, 0.5);
+    box-shadow: 0 0 8px rgba(from var(--box-button) r g b / 0.5);
 }
 
 .add-instance-input::placeholder {
@@ -1122,7 +1271,7 @@
 
 .add-instance-confirm:hover {
     transform: translateY(-2px);
-    box-shadow: 0px 4px 10px rgba(48, 252, 146, 0.4);
+    box-shadow: 0px 4px 10px rgba(from var(--box-button) r g b / 0.4);
 }
 
 .add-instance-confirm:active {
@@ -1238,26 +1387,7 @@
     justify-content: center;
     align-items: center;
     margin-top: 10px;
-    margin-right: 60px;
-    margin-left: 60px;
-    padding: 5px 10px;
-    border: none;
-    color: white;
-    font-size: 16px;
-    font-weight: bold;
-    border-radius: 5px;
-    background-color: rgba(255, 0, 0, 0.7);
-    cursor: pointer;
-    transition: background-color 0.2s;
-}
-
-.force-close-button {
-    justify-content: center;
-    align-items: center;
-    margin-top: 10px;
-    margin-right: 60px;
-    margin-left: 60px;
-    padding: 5px;
+    padding: 5px 15px;
     border: none;
     color: white;
     font-size: 14px;
@@ -1266,8 +1396,152 @@
     background-color: rgba(255, 0, 0, 0.7);
     cursor: pointer;
     transition: background-color 0.2s;
+    align-self: center;
+}
+
+.force-close-button {
+    justify-content: center;
+    align-items: center;
+    padding: 5px 15px;
+    border: none;
+    color: white;
+    font-size: 14px;
+    font-weight: bold;
+    border-radius: 5px;
+    background-color: rgba(255, 0, 0, 0.7);
+    cursor: pointer;
+    transition: background-color 0.2s;
+    align-self: center;
 }
 
 .cancel-queue-button:hover, .force-close-button:hover {
     background-color: rgba(255, 0, 0, 0.9);
+}
+
+/* Loading states for instance popup */
+.loading-container {
+    position: absolute;
+    top: 60px;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    background: rgba(0, 0, 0, 0.3);
+    z-index: 10;
+    backdrop-filter: blur(2px);
+    -webkit-backdrop-filter: blur(2px);
+}
+
+.loading-spinner {
+    width: 50px;
+    height: 50px;
+    border: 4px solid rgba(255, 255, 255, 0.3);
+    border-top: 4px solid var(--box-button);
+    border-radius: 50%;
+    animation: spin 1s linear infinite;
+    margin-bottom: 1rem;
+}
+
+@keyframes spin {
+    0% { transform: rotate(0deg); }
+    100% { transform: rotate(360deg); }
+}
+
+.loading-text {
+    color: #fff;
+    font-size: 1.2rem;
+    text-align: center;
+    font-weight: 300;
+    text-shadow: 0 2px 4px rgba(0, 0, 0, 0.5);
+}
+
+.skeleton-grid {
+    position: relative;
+    display: grid;
+    grid-template-columns: repeat(3, 250px);
+    gap: 3rem;
+    padding: 1rem;
+    justify-content: center;
+    align-content: start;
+    opacity: 0.6;
+    margin-top: 1rem;
+    z-index: 1;
+}
+
+.skeleton-instance {
+    background: rgba(255, 255, 255, 0.1);
+    border: 1px solid rgba(255, 255, 255, 0.18);
+    border-radius: 10px;
+    padding: 1rem;
+    position: relative;
+    overflow: hidden;
+    width: 250px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    backdrop-filter: blur(15.5px);
+    -webkit-backdrop-filter: blur(15.5px);
+}
+
+.skeleton-instance::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: -100%;
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.1), transparent);
+    animation: skeleton-shimmer 2s infinite;
+}
+
+@keyframes skeleton-shimmer {
+    0% { left: -100%; }
+    100% { left: 100%; }
+}
+
+.skeleton-image {
+    width: 220px;
+    height: 123.75px;
+    background: rgba(255, 255, 255, 0.15);
+    border-radius: 10px;
+    margin-bottom: 0.8rem;
+    position: relative;
+}
+
+.skeleton-name {
+    width: 70%;
+    height: 18px;
+    background: rgba(255, 255, 255, 0.15);
+    border-radius: 4px;
+    margin: 0 auto 0.5rem auto;
+}
+
+.skeleton-status {
+    width: 12px;
+    height: 12px;
+    background: rgba(255, 255, 255, 0.15);
+    border-radius: 50%;
+    margin: 0 auto;
+}
+
+/* Responsive skeleton grid */
+@media (max-width: 850px) {
+    .skeleton-grid {
+        grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+        gap: 2rem;
+    }
+    
+    .skeleton-instance {
+        width: auto;
+        max-width: 250px;
+    }
+    
+    .skeleton-image {
+        width: 100%;
+        height: auto;
+        aspect-ratio: 16/9;
+    }
 }

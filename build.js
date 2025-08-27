@@ -6,7 +6,7 @@ const nodeFetch = require('node-fetch')
 const png2icons = require('png2icons');
 const Jimp = require('jimp');
 
-const { preductname } = require('./package.json');
+const { productname } = require('./package.json');
 
 class Index {
     async init() {
@@ -42,7 +42,7 @@ class Index {
                 if (extFile == 'js') {
                     let code = fs.readFileSync(path, "utf8");
                     code = code.replace(/src\//g, 'app/');
-                    if (this.obf && fileName !== 'MKLib.js' && fileName !== 'encrypted-storage.js') {
+                    if (this.obf && fileName !== 'MKLib.js' && fileName !== 'encrypted-storage.js' && fileName !== 'instance-manager.js') {
                         await new Promise((resolve) => {
                             console.log(`Obfuscate ${path}`);
                             let obf = JavaScriptObfuscator.obfuscate(code, { optionsPreset: 'high-obfuscation', disableConsoleOutput: false });
@@ -58,14 +58,64 @@ class Index {
             }
     }
 
+    async checkAndGenerateIcons(sourceDir, targetDir) {
+        console.log('Checking icon files...');
+        
+        const pngPath = `${sourceDir}/assets/images/icon.png`;
+        const icoPath = `${targetDir}/assets/images/icon.ico`;
+        const icnsPath = `${targetDir}/assets/images/icon.icns`;
+        
+        // Check if source PNG exists
+        if (!fs.existsSync(pngPath)) {
+            console.error('Error: Source icon.png not found in', pngPath);
+            return false;
+        }
+        
+        // Create target directory if it doesn't exist
+        if (!fs.existsSync(`${targetDir}/assets/images`)) {
+            fs.mkdirSync(`${targetDir}/assets/images`, { recursive: true });
+        }
+        
+        // Copy PNG to target directory
+        fs.copyFileSync(pngPath, `${targetDir}/assets/images/icon.png`);
+        
+        try {
+            // Read the PNG file
+            const buffer = fs.readFileSync(pngPath);
+            const image = await Jimp.read(buffer);
+            const resizedBuffer = await image.resize(256, 256).getBufferAsync(Jimp.MIME_PNG);
+            
+            // Generate ICO if it doesn't exist
+            if (!fs.existsSync(icoPath)) {
+                console.log('Generating icon.ico...');
+                fs.writeFileSync(icoPath, png2icons.createICO(resizedBuffer, png2icons.HERMITE, 0, false));
+            }
+            
+            // Generate ICNS if it doesn't exist
+            if (!fs.existsSync(icnsPath)) {
+                console.log('Generating icon.icns...');
+                fs.writeFileSync(icnsPath, png2icons.createICNS(resizedBuffer, png2icons.BILINEAR, 0));
+            }
+            
+            return true;
+        } catch (error) {
+            console.error('Error generating icon files:', error);
+            return false;
+        }
+    }
+
     async buildPlatform() {
         await this.Obfuscate();
+        
+        // Check and generate icon files before building
+        await this.checkAndGenerateIcons('src', 'app');
+        
         builder.build({
             config: {
                 generateUpdatesFilesForAllChannels: false,
-                appId: preductname,
-                productName: preductname,
-                copyright: 'Copyright © 2020-2024 Luuxis',
+                appId: productname,
+                productName: productname,
+                copyright: 'Copyright © 2020-2025 Miguelki & Luuxis',
                 artifactName: "${productName}-${os}-${arch}.${ext}",
                 extraMetadata: { main: 'app/app.js' },
                 files: ["app/**/*", "package.json", "LICENSE.md"],
@@ -111,7 +161,7 @@ class Index {
                 }
             }
         }).then(() => {
-            console.log('le build est terminé')
+            console.log('Build completada!')
         }).catch(err => {
             console.error('Error during build!', err)
         })
