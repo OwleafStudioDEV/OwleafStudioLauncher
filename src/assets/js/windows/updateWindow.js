@@ -28,7 +28,7 @@ function createWindow() {
     let backupImagePath = './src/assets/images/background/updatebg.jpg'; // Path to backup image
 
     updateWindow = new BrowserWindow({
-        title: "Owleaf Studio Launcher",
+        title: pkg.productName,
         width: 400,
         height: 500,
         resizable: false,
