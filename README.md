@@ -233,8 +233,8 @@ Para ver el reporte detallado con la matriz completa de compatibilidad, consulta
 
 ## 🎮 Compatibilidad de Loaders
 
-> **Última actualización:** 21 de septiembre de 2025  
-> **Total de pruebas:** 330 | **Exitosas:** 180 (54.5%)
+> **Última actualización:** 26 de septiembre de 2025  
+> **Total de pruebas:** 330 | **Exitosas:** 178 (53.9%)
 
 ### 📊 Resumen por Loader
 
@@ -242,7 +242,7 @@ Para ver el reporte detallado con la matriz completa de compatibilidad, consulta
 |--------|----------------|---------------------|
 | **VANILLA** | 84.8% | 56/66 |
 | **FORGE** | 65.2% | 43/66 |
-| **NEOFORGE** | 10.6% | 7/66 |
+| **NEOFORGE** | 7.6% | 5/66 |
 | **FABRIC** | 59.1% | 39/66 |
 | **QUILT** | 53.0% | 35/66 |
 
@@ -305,14 +305,14 @@ Para ver el reporte detallado con la matriz completa de compatibilidad, consulta
 | 1.20.1 | ✅ | ✅ | ❌ | ✅ | ✅ | 4/5 | |
 | 1.20.2 | ✅ | ✅ | ✅ | ✅ | ✅ | 5/5 | |
 | 1.20.3 | ✅ | ✅ | ❌ | ✅ | ✅ | 4/5 | |
-| 1.20.4 | ✅ | ✅ | ✅ | ✅ | ✅ | 5/5 | |
+| 1.20.4 | ✅ | ✅ | ❌ | ✅ | ✅ | 4/5 | |
 | 1.20.5 | ✅ | ❌ | ❌ | ✅ | ✅ | 3/5 | |
 | 1.20.6 | ✅ | ✅ | ✅ | ✅ | ✅ | 5/5 | |
 | 1.21 | ✅ | ✅ | ❌ | ✅ | ✅ | 4/5 | |
 | 1.21.1 | ✅ | ✅ | ✅ | ✅ | ✅ | 5/5 | |
 | 1.21.2 | ✅ | ❌ | ❌ | ✅ | ✅ | 3/5 | |
 | 1.21.3 | ✅ | ✅ | ✅ | ✅ | ✅ | 5/5 | |
-| 1.21.4 | ✅ | ✅ | ✅ | ✅ | ✅ | 5/5 | |
+| 1.21.4 | ✅ | ✅ | ❌ | ✅ | ✅ | 4/5 | |
 | 1.21.5 | ✅ | ✅ | ✅ | ✅ | ✅ | 5/5 | |
 | 1.21.6 | ✅ | ✅ | ❌ | ✅ | ✅ | 4/5 | |
 | 1.21.7 | ✅ | ✅ | ❌ | ✅ | ✅ | 4/5 | |
